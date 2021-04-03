@@ -1,8 +1,10 @@
-﻿using Restaurant_Menu_Management_System__Web_API_Project_.Models;
+﻿using Newtonsoft.Json;
+using Restaurant_Menu_Management_System__Web_API_Project_.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -16,7 +18,7 @@ namespace Restaurant_Menu_Management_System__Web_API_Project_.Controllers
         
         [Route("api/item/add")]
         [HttpPost]
-        public string AddItem(Models.Item item)
+        public string AddItem(Item item)
         {
             string result = "";
             try
@@ -44,14 +46,14 @@ namespace Restaurant_Menu_Management_System__Web_API_Project_.Controllers
             return result;
         }
 
-        [Route("api/item/delete")]
+        [Route("api/item/delete/{id:int}")]
         [HttpDelete]
-        public string DeleteItem(Item item)
+        public string DeleteItem(int id)
         {
             SqlConnection con = new SqlConnection(constring);
             string query = "DELETE FROM Items WHERE Id=@id";
             SqlCommand com = new SqlCommand(query, con);
-            com.Parameters.AddWithValue("@id", item.Id);
+            com.Parameters.AddWithValue("@id", id);
             con.Open();
             com.ExecuteNonQuery();
             con.Close();
@@ -77,18 +79,17 @@ namespace Restaurant_Menu_Management_System__Web_API_Project_.Controllers
             return ds;
         }
 
-        [Route("api/item/search")]
-        [HttpPut]
-        public DataSet SearchItem(Item item)
+        [Route("api/item/search/{id:int}")]
+        [HttpGet]
+        public DataSet SearchItem(int id)
         {
             DataSet ds = new DataSet();
             try
             {
                 SqlConnection con = new SqlConnection(constring);
                 string Query = "SELECT * FROM Items WHERE Id=@id";
-
                 SqlDataAdapter sda = new SqlDataAdapter(Query, con);
-                sda.SelectCommand.Parameters.AddWithValue("@id", item.Id);
+                sda.SelectCommand.Parameters.AddWithValue("@id", id);
                 sda.Fill(ds);
             }
             catch (Exception ex)
